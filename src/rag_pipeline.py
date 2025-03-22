@@ -16,7 +16,6 @@ class State(TypedDict):
     context: List[Document]
     answer: str
 
-
 # Define application steps
 def retrieve(state: State):
     retrieved_docs = vector_store.similarity_search(state["question"])
