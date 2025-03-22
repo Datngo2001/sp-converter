@@ -5,10 +5,6 @@ from typing_extensions import List, TypedDict
 
 from llm_model import llm, sampling_params
 from vector_store import vector_store
-from knowledge_indexer import start_index
-
-# Start the knowledge indexer
-start_index()
 
 # Define prompt for question-answering
 prompt = hub.pull("rlm/rag-prompt")
@@ -45,10 +41,3 @@ def generate(state: State):
 graph_builder = StateGraph(State).add_sequence([retrieve, generate])
 graph_builder.add_edge(START, "retrieve")
 graph = graph_builder.compile()
-
-
-# Test the application
-print("Testing the application...")
-
-response = graph.invoke({"question": "What is [dbo].[DatabaseLog]?"})
-print(response["answer"])
