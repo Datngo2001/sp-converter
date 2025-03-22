@@ -15,6 +15,15 @@ print(f"Using glob pattern: {glob_pattern}")
 print(f"Absolute path: {os.path.abspath(path)}")
 print(f"Directory exists: {os.path.isdir(path)}")
 
+# Ask for user confirmation before clearing existing documents
+confirm = input("Do you want to clear existing documents in the vector store? (yes/no): ").strip().lower()
+if confirm == 'yes':
+    print("Clearing existing documents in the vector store...")
+    vector_store.reset_collection()
+    print("Existing documents cleared.")
+else:
+    print("Skipping clearing of existing documents.")
+
 print("Indexing knowledge base...")
 total_files = loader.count_matching_files()
 print(f"Found {total_files} files to index.")
