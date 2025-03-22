@@ -11,7 +11,7 @@ from typing_extensions import List, TypedDict
 
 
 # Load and index knowledge base
-loader = FileSystemBlobLoader(path="./knowledge_base", glob="**/*.txt")
+loader = FileSystemBlobLoader(path="../knowledge_base", glob="**/*.txt")
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 
 for blob in loader.yield_blobs():

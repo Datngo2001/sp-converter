@@ -4,7 +4,7 @@ from huggingface_hub import snapshot_download
 # Download the Phi-3 model locally (this will take time)
 model_path = snapshot_download(
     repo_id="microsoft/phi-3-mini-4k-instruct",
-    cache_dir="./models"
+    cache_dir="../models"
 )
 
 print(f"Model downloaded to: {model_path}")
