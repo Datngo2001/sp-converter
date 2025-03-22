@@ -1,22 +1,11 @@
-from knowledge_loader import KnowledgeLoader
-from llm_model import llm, sampling_params
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
-from vector_store import vector_store
-    
 from langchain import hub
-from langchain_community.document_loaders import FileSystemBlobLoader
 from langgraph.graph import START, StateGraph
 from typing_extensions import List, TypedDict
 
+from llm_model import llm, sampling_params
+from vector_store import vector_store
 
-# Load and index knowledge base
-loader = FileSystemBlobLoader(path="../knowledge_base", glob="**/*.txt")
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-
-for blob in loader.yield_blobs():
-    all_splits = text_splitter.create_documents([blob.as_string()])
-    _ = vector_store.add_documents(documents=all_splits)
 
 # Define prompt for question-answering
 prompt = hub.pull("rlm/rag-prompt")
