@@ -6,9 +6,6 @@ from typing_extensions import List, TypedDict
 from llm_model import llm, sampling_params
 from vector_store import vector_store
 
-# Define prompt for question-answering
-prompt = hub.pull("rlm/rag-prompt")
-
 # Define state for application
 class State(TypedDict):
     question: str
@@ -22,11 +19,11 @@ def retrieve(state: State):
 
 def create_prompt(question: str, context: str):
     prompt_str = (
-        "You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. "
-        "If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.\n"
-        f"Question: {question}\n"
+        "You are an assistant for converting SQL queries to C# LINQ. Use the following pieces of retrieved context to perform the conversion. "
+        "If you don't know the conversion, just say that you don't know. Provide the LINQ equivalent of the given SQL query in the form of C# console app with entity framework core.\n"
+        f"SQL Query: {question}\n"
         f"Context: {context}\n"
-        "Answer:"
+        "C# console app with entity framework core:"
     )
     return prompt_str
 

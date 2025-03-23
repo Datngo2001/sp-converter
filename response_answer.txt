@@ -1,0 +1,65 @@
+
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace AddressQueryExample
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            using (var context = new AdventureWorks2022DbContext())
+            {
+                // Assuming the AdventureWorks2022DbContext is set up with the correct connection string
+                // and has been configured to include the necessary entities and relationships.
+
+                // Query to select the specified columns from the Address table
+                var addressesQuery = context.Addresses
+                    .Select(a => new
+                    {
+                        AddressID = a.AddressID,
+                        AddressLine1 = a.AddressLine1,
+                        AddressLine2 = a.AddressLine2,
+                        City = a.City,
+                        StateProvinceID = a.StateProvinceID,
+                        PostalCode = a.PostalCode,
+                        SpatialLocation = a.SpatialLocation,
+                        rowguid = a.rowguid,
+                        ModifiedDate = a.ModifiedDate
+                    });
+
+                // Execute the query and iterate over the results
+                foreach (var address in addressesQuery)
+                {
+                    Console.WriteLine($"AddressID: {address.AddressID}, AddressLine1: {address.AddressLine1}, AddressLine2: {address.AddressLine2}, City: {address.City}, StateProvinceID: {address.StateProvinceID}, PostalCode: {address.PostalCode}, SpatialLocation: {address.SpatialLocation}, rowguid: {address.rowguid}, ModifiedDate: {address.ModifiedDate}");
+                }
+            }
+        }
+    }
+
+    public class AdventureWorks2022DbContext : DbContext
+    {
+        public DbSet<Address> Addresses { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            // Configure the connection string and other options as needed
+            optionsBuilder.UseSqlServer("YourConnectionStringHere");
+        }
+    }
+
+    public class Address
+    {
+        public int AddressID { get; set; }
+        public string AddressLine1 { get; set; }
+        public string AddressLine2 { get; set; }
+        public string City { get; set; }
+        public int StateProvinceID { get; set; }
+        public string PostalCode { get; set; }
+        public string SpatialLocation { get; set; }
+        public string rowguid { get; set; }
+        public DateTime ModifiedDate { get; set; }
+    }
+}

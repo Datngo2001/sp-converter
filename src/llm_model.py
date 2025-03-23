@@ -13,4 +13,4 @@ print(f"Model downloaded to: {model_path}")
 llm = LLM(model=model_path, dtype="float16")  # Use GPU acceleration if available
 
 # Set sampling parameters
-sampling_params = SamplingParams(temperature=0.7, top_p=0.9, max_tokens=100)
+sampling_params = SamplingParams(temperature=0.1, top_p=0.5, max_tokens=5000)
