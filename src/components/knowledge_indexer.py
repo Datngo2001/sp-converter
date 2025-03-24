@@ -1,6 +1,6 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import FileSystemBlobLoader
-from vector_store import vector_store
+from .vector_store import vector_store
 import os
 import chardet
 

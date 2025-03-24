@@ -3,8 +3,8 @@ from langchain import hub
 from langgraph.graph import START, StateGraph
 from typing_extensions import List, TypedDict
 
-from llm_model import llm, sampling_params
-from vector_store import vector_store
+from .llm_model import llm, sampling_params
+from .vector_store import vector_store
 
 # Define state for application
 class State(TypedDict):
