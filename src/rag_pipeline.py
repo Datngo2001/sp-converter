@@ -22,10 +22,8 @@ def create_prompt(question: str, context: str):
         "You are an assistant for SQL server database, C#, Entity Framework Core, .NET Core."
         "Use the following pieces of retrieved context to perform the conversion."
         "If you don't know the conversion, just say that you don't know."
-        "Make sure the entity class have all the table columns"
         "Provide result in the form of C# console app with entity framework core."
-        "Only provide the code, no need to explain."
-        f"SQL Tables: {question}\n"
+        f"Questions: {question}\n"
         f"Context: {context}\n"
         "C# console app with entity framework core:"
     )

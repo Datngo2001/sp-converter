@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AdventureWorks2022App
+namespace AdventureWorks2022.ConsoleApp
 {
     public class Program
     {
@@ -16,57 +16,52 @@ namespace AdventureWorks2022App
         {
             // Set up the database context
             var serviceProvider = new ServiceCollection()
-                .AddDbContext<AdventureWorks2022Context>(options =>
-                    options.UseSqlServer(
-                        "Your SQL Server connection string here"))
+                .AddDbContext<AdventureWorks2022DbContext>()
                 .BuildServiceProvider();
 
-            // Create the database context
-            using (var context = serviceProvider.GetRequiredService<AdventureWorks2022Context>())
+            // Create a scope to use the context
+            using (var scope = serviceProvider.CreateScope())
             {
+                var context = scope.ServiceProvider.GetRequiredService<AdventureWorks2022DbContext>();
+
                 // Perform database operations
-                context.Database.EnsureDeleted();
-                context.Database.EnsureCreated();
-
-                // Add sample data
-                var person = new Person
+                try
                 {
-                    FirstName = "John",
-                    LastName = "Doe",
-                    Demographics = new XmlDataType { XmlData = "<IndividualSurveySchemaCollection><AdditionalContactInfoSchemaCollection></AdditionalContactInfoSchemaCollection></IndividualSurveySchemaCollection>" }
-                };
-
-                context.Persons.Add(person);
-                context.SaveChanges();
-
-                Console.WriteLine("Sample data added to the database.");
+                    // Example: Retrieve all persons
+                    var persons = context.Persons.ToList();
+                    foreach (var person in persons)
+                    {
+                        Console.WriteLine($"Name: {person.FirstName} {person.LastName}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred: {ex.Message}");
+                }
             }
         }
     }
 
-    public class AdventureWorks2022Context : DbContext
+    public class AdventureWorks2022DbContext : DbContext
     {
         public DbSet<Person> Persons { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Your SQL Server connection string here");
+            optionsBuilder.UseSqlServer("YourConnectionStringHere");
         }
     }
 
     public class Person
     {
-        public int Id { get; set; }
+        public int PersonId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public XmlDataType Demographics { get; set; }
-    }
-
-    public class XmlDataType
-    {
-        public string XmlData { get; set; }
+        // Add other properties as needed
     }
 }
 ```
 
-Note: Replace "Your SQL Server connection string here" with your actual SQL Server connection string. Also, ensure that the AdventureWorks2022 database and schema are properly set up in your SQL Server instance.
+Replace "YourConnectionStringHere" with your actual SQL Server connection string.
+
+This code sets up a console application using Entity Framework Core to interact with the AdventureWorks2022 database. It defines a `Person` entity class and a `AdventureWorks2022DbContext` class that represents the database context. The `Main` method creates a service provider, creates a scope to use the context, and retrieves all persons from the database, printing their names to the console. Make sure to install the necessary Entity Framework Core packages and configure the connection string correctly.
