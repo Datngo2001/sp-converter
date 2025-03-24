@@ -3,8 +3,8 @@ from langchain import hub
 from langgraph.graph import START, StateGraph
 from typing_extensions import List, TypedDict
 
-from .llm_model import llm, sampling_params
-from .vector_store import vector_store
+from llm_model import llm, sampling_params
+from vector_store import vector_store
 
 # Define state for application
 class State(TypedDict):
@@ -19,9 +19,16 @@ def retrieve(state: State):
 
 def create_prompt(question: str, context: str):
     prompt_str = (
-        "You are an assistant for converting SQL queries to C# LINQ. Use the following pieces of retrieved context to perform the conversion. "
-        "If you don't know the conversion, just say that you don't know. Provide the LINQ equivalent of the given SQL query in the form of C# console app with entity framework core.\n"
-        f"SQL Query: {question}\n"
+        "You are an assistant for SQL server database, C#, Entity Framework Core, .NET Core."
+        "Use the following pieces of retrieved context to perform the conversion."
+        "If you don't know the conversion, just say that you don't know."
+        "Looking for the create table sql scripts for the provided tables."
+        "Looking for example C# code to create entities class corresponding to the provided tables."
+        "Create entities class corresponding to the provided tables, then select top 10 records to make sure it work."
+        "Make sure you and the Table data annotation to the entities class, with table name and schema name."
+        "Provide result in the form of C# console app with entity framework core."
+        "Only provide the code, no need to explain."
+        f"SQL Tables: {question}\n"
         f"Context: {context}\n"
         "C# console app with entity framework core:"
     )

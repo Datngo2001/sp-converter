@@ -1,12 +1,12 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import FileSystemBlobLoader
-from .vector_store import vector_store
+from vector_store import vector_store
 import os
 import chardet
 
 # Load and index knowledge base
 path = "/home/datngominh/sp-converter/knowledge_base"
-glob_pattern = "*.sql"
+glob_pattern = "**/[!.]*"
 loader = FileSystemBlobLoader(path=path, glob=glob_pattern)
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 

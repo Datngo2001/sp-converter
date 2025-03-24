@@ -1,3 +1,7 @@
+This is an example of create entity from "[Person].[Address]" table.
+
+```csharp
+
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -14,19 +18,7 @@ namespace AddressQueryExample
                 // and has been configured to include the necessary entities and relationships.
 
                 // Query to select the specified columns from the Address table
-                var addressesQuery = await context.Addresses
-                    .Select(a => new
-                    {
-                        AddressID = a.AddressID,
-                        AddressLine1 = a.AddressLine1,
-                        AddressLine2 = a.AddressLine2,
-                        City = a.City,
-                        StateProvinceID = a.StateProvinceID,
-                        PostalCode = a.PostalCode,
-                        SpatialLocation = a.SpatialLocation,
-                        rowguid = a.rowguid,
-                        ModifiedDate = a.ModifiedDate
-                    }).ToListAsync();
+                var addressesQuery = await context.Addresses.Take(10).ToListAsync();
 
                 // Execute the query and iterate over the results
                 foreach (var address in addressesQuery.Take(10))
@@ -43,7 +35,6 @@ namespace AddressQueryExample
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // Replace 'your_username' and 'your_password' with your actual SQL Server credentials
             optionsBuilder.UseSqlServer(
                 "Server=DESKTOP-PDA3ULB;Database=AdventureWorks2022;Trusted_Connection=True;TrustServerCertificate=True;",
                 x => x.UseNetTopologySuite()
@@ -65,3 +56,5 @@ namespace AddressQueryExample
         public DateTime ModifiedDate { get; set; }
     }
 }
+
+```
