@@ -1,0 +1,72 @@
+
+
+```csharp
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace AdventureWorks2022App
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            // Set up the database context
+            var serviceProvider = new ServiceCollection()
+                .AddDbContext<AdventureWorks2022Context>(options =>
+                    options.UseSqlServer(
+                        "Your SQL Server connection string here"))
+                .BuildServiceProvider();
+
+            // Create the database context
+            using (var context = serviceProvider.GetRequiredService<AdventureWorks2022Context>())
+            {
+                // Perform database operations
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+
+                // Add sample data
+                var person = new Person
+                {
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Demographics = new XmlDataType { XmlData = "<IndividualSurveySchemaCollection><AdditionalContactInfoSchemaCollection></AdditionalContactInfoSchemaCollection></IndividualSurveySchemaCollection>" }
+                };
+
+                context.Persons.Add(person);
+                context.SaveChanges();
+
+                Console.WriteLine("Sample data added to the database.");
+            }
+        }
+    }
+
+    public class AdventureWorks2022Context : DbContext
+    {
+        public DbSet<Person> Persons { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer("Your SQL Server connection string here");
+        }
+    }
+
+    public class Person
+    {
+        public int Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public XmlDataType Demographics { get; set; }
+    }
+
+    public class XmlDataType
+    {
+        public string XmlData { get; set; }
+    }
+}
+```
+
+Note: Replace "Your SQL Server connection string here" with your actual SQL Server connection string. Also, ensure that the AdventureWorks2022 database and schema are properly set up in your SQL Server instance.
