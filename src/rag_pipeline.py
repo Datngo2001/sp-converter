@@ -3,7 +3,7 @@ from langchain import hub
 from langgraph.graph import START, StateGraph
 from typing_extensions import List, TypedDict
 
-from llm_model import llm, sampling_params
+from llm_model import generate_text
 from vector_store import vector_store
 
 # Define state for application
@@ -19,21 +19,21 @@ def retrieve(state: State):
 
 def create_prompt(question: str, context: str):
     prompt_str = (
-        "You are an assistant for SQL server database, C#, Entity Framework Core, .NET Core."
-        "Use the following pieces of retrieved context to perform the conversion."
-        "If you don't know the conversion, just say that you don't know."
-        "Provide result in the form of C# console app with entity framework core."
-        f"Questions: {question}\n"
-        f"Context: {context}\n"
-        "C# console app with entity framework core:"
+        "You are a highly skilled assistant specializing in SQL Server databases, C#, Entity Framework Core, and .NET Core development.\n"
+        "Your task is to generate accurate and efficient C# code based on the provided context and task description.\n"
+        "Use the following retrieved context to perform the task. If the context is insufficient or you are unsure, respond with 'I don't know'.\n"
+        "Ensure the code adheres to best practices and is production-ready.\n\n"
+        f"Task Description: {question}\n"
+        f"Retrieved Context:\n{context}\n\n"
+        "Generated C# Code:"
     )
     return prompt_str
 
 def generate(state: State):
     docs_content = "\n\n".join(doc.page_content for doc in state["context"])
     messages = create_prompt(state["question"], docs_content)
-    response = llm.generate(messages, sampling_params)
-    return {"answer": response[0].outputs[0].text}
+    response = generate_text(messages, max_length=2000)
+    return {"answer": response}
 
 
 # Compile application and test

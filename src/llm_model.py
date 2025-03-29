@@ -1,16 +1,31 @@
-from vllm import LLM, SamplingParams 
-from huggingface_hub import snapshot_download
+from functools import cache
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
 
-# Download the Phi-3 model locally (this will take time)
-model_path = snapshot_download(
-    repo_id="microsoft/phi-3-mini-4k-instruct",
-    cache_dir="/home/datngominh/sp-converter/models"
+# Load tokenizer and model
+tokenizer = AutoTokenizer.from_pretrained(
+    "deepseek-ai/deepseek-coder-1.3b-base", 
+    trust_remote_code=True,
+    cache_dir="/home/datngominh/sp-converter/models",
 )
 
-print(f"Model downloaded to: {model_path}")
+model = AutoModelForCausalLM.from_pretrained(
+    "deepseek-ai/deepseek-coder-1.3b-base", 
+    trust_remote_code=True,
+    cache_dir="/home/datngominh/sp-converter/models",
+).cuda()
 
-# Load the model with vLLM
-llm = LLM(model=model_path, dtype="float16")  # Use GPU acceleration if available
+def generate_text(prompt, max_length=128):
+    """
+    Generate text based on the given prompt.
 
-# Set sampling parameters
-sampling_params = SamplingParams(temperature=0.1, top_p=0.5, max_tokens=100000)
+    Args:
+        prompt (str): The input text prompt.
+        max_length (int): The maximum length of the generated text.
+
+    Returns:
+        str: The generated text.
+    """
+    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+    outputs = model.generate(**inputs, max_length=max_length)
+    return tokenizer.decode(outputs[0], skip_special_tokens=True)

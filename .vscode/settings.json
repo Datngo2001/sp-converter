@@ -4,5 +4,6 @@
     "python.analysis.extraPaths": [
         "./src",
         "./src/components",
+        ".venv"
     ]
 }
