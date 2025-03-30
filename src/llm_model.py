@@ -15,7 +15,7 @@ model = AutoModelForCausalLM.from_pretrained(
     cache_dir="/home/datngominh/sp-converter/models",
 ).cuda()
 
-def generate_text(prompt, max_length=128):
+def generate_text(prompt, max_new_tokens=128):
     """
     Generate text based on the given prompt.
 
@@ -27,5 +27,5 @@ def generate_text(prompt, max_length=128):
         str: The generated text.
     """
     inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
-    outputs = model.generate(**inputs, max_length=max_length)
+    outputs = model.generate(**inputs, max_new_tokens=max_new_tokens)
     return tokenizer.decode(outputs[0], skip_special_tokens=True)

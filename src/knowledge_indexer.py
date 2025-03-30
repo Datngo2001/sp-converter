@@ -1,14 +1,13 @@
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import FileSystemBlobLoader
 from vector_store import vector_store
 import os
 import chardet
+from langchain_core.documents import Document
 
 # Load and index knowledge base
 path = "/home/datngominh/sp-converter/knowledge_base"
 glob_pattern = "**/[!.]*"
 loader = FileSystemBlobLoader(path=path, glob=glob_pattern)
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 
 print(f"Checking path: {path}")
 print(f"Using glob pattern: {glob_pattern}")
@@ -38,9 +37,8 @@ for blob in loader.yield_blobs():
     
     try:
         file_text = file_content.decode(encoding)
-        all_splits = text_splitter.create_documents([file_text])
         _ = vector_store.add_documents(
-            documents=all_splits,
+            documents=[Document(page_content=file_text)],
             identifiers=[blob.path],
         )
         indexed_files += 1

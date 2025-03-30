@@ -8,13 +8,15 @@ from vector_store import vector_store
 
 # Define state for application
 class State(TypedDict):
-    question: str
+    task: str
+    task_hint: str
     context: List[Document]
     answer: str
 
 # Define application steps
 def retrieve(state: State):
-    retrieved_docs = vector_store.similarity_search(state["question"])
+    retrieved_docs = vector_store.similarity_search(state["task"], k=1)
+    retrieved_docs.extend(vector_store.similarity_search(state["task_hint"], k=1))
     return {"context": retrieved_docs}
 
 def create_prompt(question: str, context: str):
@@ -31,8 +33,8 @@ def create_prompt(question: str, context: str):
 
 def generate(state: State):
     docs_content = "\n\n".join(doc.page_content for doc in state["context"])
-    messages = create_prompt(state["question"], docs_content)
-    response = generate_text(messages, max_length=2000)
+    messages = create_prompt(state["task"], docs_content)
+    response = generate_text(messages, max_new_tokens=512)
     return {"answer": response}
 
 
