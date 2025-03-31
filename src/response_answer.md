@@ -4,7 +4,8 @@ Use the following retrieved context to perform the task. If the context is insuf
 Ensure the code adheres to best practices and is production-ready.
 
 Task Description: 
-    Help me create entity class for the table [Person].[Person]
+    Help me create entity class for the table [Person].[Person].
+    The enetity class should contain all the columns in the table.
   
 Retrieved Context:
 This is an example of create entity from "[Person].[Address]" table.
@@ -67,108 +68,6 @@ namespace AddressQueryExample
 }
 
 ```
-
-USE [AdventureWorks2022]
-GO
-/****** Object:  Schema [Person]    Script Date: 3/20/2025 10:13:39 PM ******/
-CREATE SCHEMA [Person]
-GO
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Contains objects related to names and addresses of customers, vendors, and employees' , @level0type=N'SCHEMA',@level0name=N'Person'
-GO
-
-
-USE [AdventureWorks2022]
-GO
-/****** Object:  Schema [HumanResources]    Script Date: 3/20/2025 10:13:39 PM ******/
-CREATE SCHEMA [HumanResources]
-GO
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Contains objects related to employees and departments.' , @level0type=N'SCHEMA',@level0name=N'HumanResources'
-GO
-
-
-USE [AdventureWorks2022]
-GO
-/****** Object:  UserDefinedFunction [dbo].[ufnGetContactInformation]    Script Date: 3/20/2025 10:13:39 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE FUNCTION [dbo].[ufnGetContactInformation](@PersonID int)
-RETURNS @retContactInformation TABLE 
-(
-    -- Columns returned by the function
-    [PersonID] int NOT NULL, 
-    [FirstName] [nvarchar](50) NULL, 
-    [LastName] [nvarchar](50) NULL, 
-	[JobTitle] [nvarchar](50) NULL,
-    [BusinessEntityType] [nvarchar](50) NULL
-)
-AS 
--- Returns the first name, last name, job title and business entity type for the specified contact.
--- Since a contact can serve multiple roles, more than one row may be returned.
-BEGIN
-	IF @PersonID IS NOT NULL 
-		BEGIN
-		IF EXISTS(SELECT * FROM [HumanResources].[Employee] e 
-					WHERE e.[BusinessEntityID] = @PersonID) 
-			INSERT INTO @retContactInformation
-				SELECT @PersonID, p.FirstName, p.LastName, e.[JobTitle], 'Employee'
-				FROM [HumanResources].[Employee] AS e
-					INNER JOIN [Person].[Person] p
-					ON p.[BusinessEntityID] = e.[BusinessEntityID]
-				WHERE e.[BusinessEntityID] = @PersonID;
-
-		IF EXISTS(SELECT * FROM [Purchasing].[Vendor] AS v
-					INNER JOIN [Person].[BusinessEntityContact] bec 
-					ON bec.[BusinessEntityID] = v.[BusinessEntityID]
-					WHERE bec.[PersonID] = @PersonID)
-			INSERT INTO @retContactInformation
-				SELECT @PersonID, p.FirstName, p.LastName, ct.[Name], 'Vendor Contact' 
-				FROM [Purchasing].[Vendor] AS v
-					INNER JOIN [Person].[BusinessEntityContact] bec 
-					ON bec.[BusinessEntityID] = v.[BusinessEntityID]
-					INNER JOIN [Person].ContactType ct
-					ON ct.[ContactTypeID] = bec.[ContactTypeID]
-					INNER JOIN [Person].[Person] p
-					ON p.[BusinessEntityID] = bec.[PersonID]
-				WHERE bec.[PersonID] = @PersonID;
-		
-		IF EXISTS(SELECT * FROM [Sales].[Store] AS s
-					INNER JOIN [Person].[BusinessEntityContact] bec 
-					ON bec.[BusinessEntityID] = s.[BusinessEntityID]
-					WHERE bec.[PersonID] = @PersonID)
-			INSERT INTO @retContactInformation
-				SELECT @PersonID, p.FirstName, p.LastName, ct.[Name], 'Store Contact' 
-				FROM [Sales].[Store] AS s
-					INNER JOIN [Person].[BusinessEntityContact] bec 
-					ON bec.[BusinessEntityID] = s.[BusinessEntityID]
-					INNER JOIN [Person].ContactType ct
-					ON ct.[ContactTypeID] = bec.[ContactTypeID]
-					INNER JOIN [Person].[Person] p
-					ON p.[BusinessEntityID] = bec.[PersonID]
-				WHERE bec.[PersonID] = @PersonID;
-
-		IF EXISTS(SELECT * FROM [Person].[Person] AS p
-					INNER JOIN [Sales].[Customer] AS c
-					ON c.[PersonID] = p.[BusinessEntityID]
-					WHERE p.[BusinessEntityID] = @PersonID AND c.[StoreID] IS NULL) 
-			INSERT INTO @retContactInformation
-				SELECT @PersonID, p.FirstName, p.LastName, NULL, 'Consumer' 
-				FROM [Person].[Person] AS p
-					INNER JOIN [Sales].[Customer] AS c
-					ON c.[PersonID] = p.[BusinessEntityID]
-					WHERE p.[BusinessEntityID] = @PersonID AND c.[StoreID] IS NULL; 
-		END
-
-	RETURN;
-END;
-GO
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Input parameter for the table value function ufnGetContactInformation. Enter a valid PersonID from the Person.Contact table.' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'FUNCTION',@level1name=N'ufnGetContactInformation', @level2type=N'PARAMETER',@level2name=N'@PersonID'
-GO
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Table value function returning the first name, last name, job title and contact type for a given contact.' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'FUNCTION',@level1name=N'ufnGetContactInformation'
-GO
-
 
 USE [AdventureWorks2022]
 GO
@@ -365,70 +264,6 @@ EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Check constrai
 GO
 
 
-USE [AdventureWorks2022]
-GO
-/****** Object:  Schema [Person]    Script Date: 3/20/2025 10:13:39 PM ******/
-CREATE SCHEMA [Person]
-GO
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Contains objects related to names and addresses of customers, vendors, and employees' , @level0type=N'SCHEMA',@level0name=N'Person'
-GO
-
-
-USE [AdventureWorks2022]
-GO
-/****** Object:  UserDefinedDataType [dbo].[Name]    Script Date: 3/20/2025 10:13:39 PM ******/
-CREATE TYPE [dbo].[Name] FROM [nvarchar](50) NULL
-GO
-
-
-USE [AdventureWorks2022]
-GO
-/****** Object:  Table [Person].[Password]    Script Date: 3/20/2025 10:13:40 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [Person].[Password](
-	[BusinessEntityID] [int] NOT NULL,
-	[PasswordHash] [varchar](128) NOT NULL,
-	[PasswordSalt] [varchar](10) NOT NULL,
-	[rowguid] [uniqueidentifier] ROWGUIDCOL  NOT NULL,
-	[ModifiedDate] [datetime] NOT NULL,
- CONSTRAINT [PK_Password_BusinessEntityID] PRIMARY KEY CLUSTERED 
-(
-	[BusinessEntityID] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-ALTER TABLE [Person].[Password] ADD  CONSTRAINT [DF_Password_rowguid]  DEFAULT (newid()) FOR [rowguid]
-GO
-ALTER TABLE [Person].[Password] ADD  CONSTRAINT [DF_Password_ModifiedDate]  DEFAULT (getdate()) FOR [ModifiedDate]
-GO
-ALTER TABLE [Person].[Password]  WITH CHECK ADD  CONSTRAINT [FK_Password_Person_BusinessEntityID] FOREIGN KEY([BusinessEntityID])
-REFERENCES [Person].[Person] ([BusinessEntityID])
-GO
-ALTER TABLE [Person].[Password] CHECK CONSTRAINT [FK_Password_Person_BusinessEntityID]
-GO
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Password for the e-mail account.' , @level0type=N'SCHEMA',@level0name=N'Person', @level1type=N'TABLE',@level1name=N'Password', @level2type=N'COLUMN',@level2name=N'PasswordHash'
-GO
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Random value concatenated with the password string before the password is hashed.' , @level0type=N'SCHEMA',@level0name=N'Person', @level1type=N'TABLE',@level1name=N'Password', @level2type=N'COLUMN',@level2name=N'PasswordSalt'
-GO
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'ROWGUIDCOL number uniquely identifying the record. Used to support a merge replication sample.' , @level0type=N'SCHEMA',@level0name=N'Person', @level1type=N'TABLE',@level1name=N'Password', @level2type=N'COLUMN',@level2name=N'rowguid'
-GO
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Default constraint value of NEWID()' , @level0type=N'SCHEMA',@level0name=N'Person', @level1type=N'TABLE',@level1name=N'Password', @level2type=N'CONSTRAINT',@level2name=N'DF_Password_rowguid'
-GO
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Date and time the record was last updated.' , @level0type=N'SCHEMA',@level0name=N'Person', @level1type=N'TABLE',@level1name=N'Password', @level2type=N'COLUMN',@level2name=N'ModifiedDate'
-GO
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Default constraint value of GETDATE()' , @level0type=N'SCHEMA',@level0name=N'Person', @level1type=N'TABLE',@level1name=N'Password', @level2type=N'CONSTRAINT',@level2name=N'DF_Password_ModifiedDate'
-GO
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Primary key (clustered) constraint' , @level0type=N'SCHEMA',@level0name=N'Person', @level1type=N'TABLE',@level1name=N'Password', @level2type=N'CONSTRAINT',@level2name=N'PK_Password_BusinessEntityID'
-GO
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'One way hashed authentication information' , @level0type=N'SCHEMA',@level0name=N'Person', @level1type=N'TABLE',@level1name=N'Password'
-GO
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Foreign key constraint referencing Person.BusinessEntityID.' , @level0type=N'SCHEMA',@level0name=N'Person', @level1type=N'TABLE',@level1name=N'Password', @level2type=N'CONSTRAINT',@level2name=N'FK_Password_Person_BusinessEntityID'
-GO
-
-
 Generated C# Code:
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
@@ -485,3 +320,48 @@ namespace AddressQueryExample
     }
 }
 
+
+A: I'm not sure if this is the best way to do it, but I've been able to get it to work.
+I've created a new class called AddressEntity.cs and added the following code:
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
+namespace AddressQueryExample
+{
+    [Table("Address", Schema = "Person")]
+    public class AddressEntity
+    {
+        public int AddressID { get; set; }
+        public string AddressLine1 { get; set; } = string.Empty;
+        public string? AddressLine2 { get; set; }
+        public string City { get; set; } = string.Empty;
+        public int StateProvinceID { get; set; }
+        public string PostalCode { get; set; } = string.Empty;
+        public Point? SpatialLocation { get; set; }
+        public Guid rowguid { get; set; }
+        public DateTime ModifiedDate { get; set; }
+
+        [JsonIgnore]
+        public Address Address { get; set; }
+    }
+}
+
+Then I added the following code to the Program.cs file:
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace AddressQueryExample
+{
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            using (var context = new AdventureWorks2022DbContext())
+            {
+                // Assuming the AdventureWorks2022DbContext is set up with the correct connection string
+                // and has been configured to include the necessary entities and relationships.
+
+                // Query to select the specified columns from the Address table
+                var addressesQuery = await context.Addresses.Take(10).ToListAsync();
+
+                // Exec
