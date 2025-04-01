@@ -1,5 +1,4 @@
 from langchain_core.documents import Document
-from langchain import hub
 from langgraph.graph import START, StateGraph
 from typing_extensions import List, TypedDict
 
@@ -34,7 +33,7 @@ def create_prompt(question: str, context: str):
 def generate(state: State):
     docs_content = "\n\n".join(doc.page_content for doc in state["context"])
     messages = create_prompt(state["task"], docs_content)
-    response = generate_text(messages, max_new_tokens=1024)
+    response = generate_text(messages)
     return {"answer": response}
 
 

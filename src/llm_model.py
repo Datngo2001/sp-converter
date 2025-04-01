@@ -1,31 +1,14 @@
-from functools import cache
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
+from ollama import chat
+from ollama import ChatResponse
 
-# Load tokenizer and model
-tokenizer = AutoTokenizer.from_pretrained(
-    "deepseek-ai/deepseek-coder-1.3b-base", 
-    trust_remote_code=True,
-    cache_dir="/home/datngominh/sp-converter/models",
-)
-
-model = AutoModelForCausalLM.from_pretrained(
-    "deepseek-ai/deepseek-coder-1.3b-base", 
-    trust_remote_code=True,
-    cache_dir="/home/datngominh/sp-converter/models",
-).cuda()
-
-def generate_text(prompt, max_new_tokens=128):
-    """
-    Generate text based on the given prompt.
-
-    Args:
-        prompt (str): The input text prompt.
-        max_length (int): The maximum length of the generated text.
-
-    Returns:
-        str: The generated text.
-    """
-    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
-    outputs = model.generate(**inputs, max_new_tokens=max_new_tokens)
-    return tokenizer.decode(outputs[0], skip_special_tokens=True)
+def generate_text(input: str) -> str:
+    response: ChatResponse = chat(
+      model="hf.co/lmstudio-community/Phi-3.1-mini-4k-instruct-GGUF:IQ4_XS", 
+      messages=[
+        {
+            'role': 'user',
+            'content': input,
+        },
+      ]
+    )
+    return response['message']['content']
