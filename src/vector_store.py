@@ -24,5 +24,4 @@ embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-b
 vector_store = Chroma(
     embedding_function=embeddings,
     collection_name="sp_converter_collection",
-    persist_directory="/home/datngominh/sp-converter/vector_store",
 )

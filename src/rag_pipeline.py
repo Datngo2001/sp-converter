@@ -33,7 +33,7 @@ def create_prompt(question: str, context: str):
 def generate(state: State):
     docs_content = "\n\n".join(doc.page_content for doc in state["context"])
     messages = create_prompt(state["task"], docs_content)
-    response = generate_text(messages)
+    response = generate_text([messages])
     return {"answer": response}
 
 
