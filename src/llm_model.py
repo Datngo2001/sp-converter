@@ -1,16 +1,14 @@
-from vllm import LLM, SamplingParams 
-from huggingface_hub import snapshot_download
+from ollama import chat
+from ollama import ChatResponse
 
-# Download the Phi-3 model locally (this will take time)
-model_path = snapshot_download(
-    repo_id="microsoft/phi-3-mini-4k-instruct",
-    cache_dir="/home/datngominh/sp-converter/models"
-)
-
-print(f"Model downloaded to: {model_path}")
-
-# Load the model with vLLM
-llm = LLM(model=model_path, dtype="float16")  # Use GPU acceleration if available
-
-# Set sampling parameters
-sampling_params = SamplingParams(temperature=0.1, top_p=0.5, max_tokens=5000)
+def generate_text(input: str) -> str:
+    response: ChatResponse = chat(
+      model="hf.co/lmstudio-community/Phi-3.1-mini-4k-instruct-GGUF:IQ4_XS", 
+      messages=[
+        {
+            'role': 'user',
+            'content': input,
+        },
+      ]
+    )
+    return response['message']['content']

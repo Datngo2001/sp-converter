@@ -1,3 +1,9 @@
+import sys
+import os
+
+# Get the absolute path of the utils directory
+sys.path.append(os.path.abspath("src"))
+
 from rag_pipeline import graph
 
 # Test the application
