@@ -31,7 +31,7 @@ def chat(inputs: List[str]) -> ChatResponse:
       "frequency_penalty": 0.1,  # Slight penalty to discourage repetitive outputs
       "presence_penalty": 0.0    # Neutral presence penalty
     },
-    tools=tools,
+    # tools=tools,
   )
 
   return response

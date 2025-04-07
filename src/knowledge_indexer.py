@@ -37,8 +37,11 @@ for blob in loader.yield_blobs():
     
     try:
         file_text = file_content.decode(encoding)
+        
+        sql_command = file_text.replace("SET ANSI_NULLS ON\r\nGO\r\nSET QUOTED_IDENTIFIER ON\r\nGO", "")
+        
         _ = vector_store.add_documents(
-            documents=[Document(page_content=file_text)],
+            documents=[Document(page_content=sql_command)],
             identifiers=[blob.path],
         )
         indexed_files += 1
