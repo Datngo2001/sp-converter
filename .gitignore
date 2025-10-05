@@ -2,3 +2,8 @@
 models
 __pycache__/
 vector_store
+pet_saves/
+test_pet_saves/
+test_integration_saves/
+demo_saves/
+*.pyc
